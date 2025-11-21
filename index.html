@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="el">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inside Roleplay</title>
+  <style>
+    body { margin:0; font-family:sans-serif; background:#0b0f17; color:#fff }
+    header { background:linear-gradient(90deg,#6aaefc,#87f0c4); padding:14px 20px; display:flex; justify-content:space-between; align-items:center }
+    .brand { font-weight:bold; font-size:20px; color:#000 }
+    .cta { background:#000; color:#87f0c4; padding:8px 14px; border-radius:8px; font-weight:bold; text-decoration:none; cursor:pointer }
+    .cta:hover { background:#87f0c4; color:#000 }
+    .user-info { display:flex; align-items:center; gap:10px }
+    .logout-btn { display:none; background:#6aaefc; color:#000; padding:8px 12px; border:none; border-radius:6px; cursor:pointer }
+    .logout-btn:hover { background:#87f0c4 }
+
+    .lang-switch { text-align:center; margin-top:20px }
+    .lang-switch button {
+      font-size:18px; margin:0 10px; padding:6px 12px;
+      background:#131a26; color:#fff; border:none; border-radius:6px; cursor:pointer; transition:0.3s;
+    }
+    .lang-switch button:hover { background:#87f0c4; color:#000; transform:scale(1.1) }
+
+    .hero { text-align:center; margin:40px auto }
+    .stats { display:flex; justify-content:center; gap:20px; margin-top:30px }
+    .stat { background:#131a26; padding:20px; border-radius:12px; min-width:120px; transition:0.3s }
+    .stat:hover { transform:translateY(-5px); box-shadow:0 0 15px rgba(106,174,252,0.4) }
+    .num { font-size:28px; font-weight:bold }
+    .label { color:#9fb0c7; font-size:14px }
+
+    /* Cards */
+    .card {
+      background:#131a26; border-radius:12px; padding:20px; margin:30px auto;
+      max-width:600px; text-align:center; box-shadow:0 0 20px rgba(106,174,252,0.4); transition:0.3s;
+    }
+    .card:hover { transform:translateY(-5px); box-shadow:0 0 25px rgba(135,240,196,0.5) }
+    .card h2 { margin:0 0 10px; font-size:22px }
+    .card p { color:#9fb0c7; font-size:16px }
+    .discord-logo { width:50px; height:50px; margin-bottom:15px; cursor:pointer; transition:0.3s }
+    .discord-logo:hover { transform:scale(1.1) }
+
+    /* Overlays */
+    .overlay {
+      display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8);
+      z-index:999; justify-content:center; align-items:center; animation: fadeIn 0.25s ease;
+    }
+    @keyframes fadeIn { from {opacity:0} to {opacity:1} }
+    .panel-box {
+      background:#131a26; padding:30px; border-radius:12px; width:90%; max-width:420px;
+      text-align:center; position:relative; box-shadow:0 0 25px rgba(106,174,252,0.6);
+      transform:scale(0.94); animation: popIn 0.22s ease forwards;
+    }
+    @keyframes popIn { to { transform:scale(1) } }
+    .panel-box h2 { margin-top:0 }
+    .panel-box input {
+      width:85%; padding:10px; margin:10px 0; border-radius:8px;
+      border:1px solid #223047; background:#0f141f; color:#fff; transition:0.25s;
+    }
+    .panel-box input:focus { outline:none; border-color:#87f0c4; box-shadow:0 0 8px #87f0c4 }
+    .panel-box button {
+      background:#87f0c4; color:#000; padding:10px 20px; border:none;
+      border-radius:8px; font-weight:bold; cursor:pointer; transition:0.2s;
+    }
+    .panel-box button:hover { background:#6aaefc; transform:scale(1.04) }
+    .close-btn {
+      position:absolute; top:10px; right:14px; font-size:20px; color:#87f0c4;
+      cursor:pointer; font-weight:bold; transition:0.25s;
+    }
+    .close-btn:hover { color:#6aaefc; transform:rotate(90deg) }
+    .link { color:#6aaefc; cursor:pointer; display:block; margin-top:10px }
+    .link:hover { text-decoration:underline }
+    .msg { margin-top:10px; min-height:20px }
+    .ok { color:#87f0c4 }
+    .err { color:#ff9aa2 }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="brand">Inside Roleplay</div>
+  <div class="user-info">
+    <a id="loginBtn" class="cta">Login</a>
+    <button id="logoutBtn" class="logout-btn">Logout</button>
+  </div>
+</header>
+
+<div class="lang-switch">
+  <button id="btnEl">🇬🇷 Ελληνικά</button>
+  <button id="btnEn">🇬🇧 English</button>
+</div>
+
+<main>
+  <div class="hero">
+    <h1 id="title">Inside Roleplay</h1>
+    <p id="description">Καλωσήρθες στον Inside Roleplay — Ένας RP Server στο Roblox.</p>
+    <div class="stats">
+      <div class="stat">
+        <div class="num">24/7</div>
+        <div class="label" id="uptimeLabel">Ώρες λειτουργίας</div>
+      </div>
+      <div class="stat">
+        <div class="num" id="onlineCount">0</div>
+        <div class="label" id="playersLabel">Ενεργοί Παίκτες</div>
+      </div>
+      <div class="stat">
+        <div class="num">Anti‑Cheat</div>
+        <div class="label" id="securityLabel">Ασφάλεια</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center; margin-top:20px;">
+    <a href="https://discord.gg/U3rXgWNtj" target="_blank" aria-label="Join Discord">
+      <img src="https://cdn-icons-png.flaticon.com/512/5968/5968756.png" alt="Discord" class="discord-logo">
+    </a>
+  </div>
+
+  <div class="card">
+    <h2 id="rulesTitle">📕〢Server Rules</h2>
+    <p id="rulesDesc">Είμαστε Ευγενικοί δεν Κοροϊδεύουμε.<br>Παίζουμε σωστό RP.<br>Επίσης ακούμε τα Staffs.</p>
+  </div>
+
+  <div class="card">
+    <h2 id="infoTitle">🌴〢Server Info.</h2>
+    <p id="infoDesc">Created: 31 Ιούλιου του 25</p>
+  </div>
+</main>
+
+<div id="loginOverlay" class="overlay" aria-hidden="true">
+  <div class="panel-box" role="dialog" aria-modal="true">
+    <div id="closeLogin" class="close-btn" title="Close">✖</div>
+    <h2 id="loginTitle">Login</h2>
+    <input type="text" id="loginUsername" placeholder="Username" autocomplete="username">
+    <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password">
+    <button id="doLogin">Login</button>
+    <span id="toRegister" class="link">Δεν έχεις λογαριασμό; Register</span>
+    <div id="loginMsg" class="msg"></div>
+  </div>
+</div>
+
+<div id="registerOverlay" class="overlay" aria-hidden="true">
+  <div class="panel-box" role="dialog" aria-modal="true">
+    <div id="closeRegister" class="close-btn" title="Close">✖</div>
+    <h2 id="registerTitle">Register</h2>
+    <input type="text" id="regUsername" placeholder="Username" autocomplete="username">
+    <input type="password" id="regPassword" placeholder="Password" autocomplete="new-password">
+    <button id="doRegister">Register</button>
+    <div id="registerMsg" class="msg"></div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = (id) => document.getElementById(id);
+
+  // Elements
+  const loginBtn = $('loginBtn');
+  const logoutBtn = $('logoutBtn');
+  const btnEl = $('btnEl');
+  const btnEn = $('btnEn');
+  const onlineCountEl = $('onlineCount');
+
+  const loginOverlay = $('loginOverlay');
+  const registerOverlay = $('registerOverlay');
+  const closeLogin = $('closeLogin');
+  const closeRegister = $('closeRegister');
+  const toRegister = $('toRegister');
+  const doLogin = $('doLogin');
+  const doRegister = $('doRegister');
+  const loginMsg = $('loginMsg');
+  const registerMsg = $('registerMsg');
+
+  const isLoggedIn = () => localStorage.getItem('InsideRP_LoggedIn') === 'true';
+
+  // Language switcher
+  const setLanguage = (lang) => {
+    const t = (id, text) => { const el = $(id); if (el) el.textContent = text; };
+    if (lang === 'el') {
+      t('description', 'Καλωσήρθες στον Inside Roleplay — Ένας RP Server στο Roblox.');
+      t('uptimeLabel', 'Ώρες λειτουργίας');
+      t('playersLabel', 'Ενεργοί Παίκτες');
+      t('securityLabel', 'Ασφάλεια');
+      t('rulesTitle', '📕〢Server Rules');
+      $('rulesDesc').innerHTML = 'Είμαστε Ευγενικοί δεν Κοροϊδεύουμε.<br>Παίζουμε σωστό RP.<br>Επίσης ακούμε τα Staffs.';
+      t('infoTitle', '🌴〢Server Info.');
+      t('infoDesc', 'Created: 31 Ιούλιου του 25');
+      t('loginTitle', 'Login');
+      t('registerTitle', 'Register');
+      t('toRegister', 'Δεν έχεις λογαριασμό; Register');
+      if (logoutBtn) logoutBtn.textContent = 'Logout';
+      if (btnEl) btnEl.textContent = '🇬🇷 Ελληνικά';
+      if (btnEn) btnEn.textContent = '🇬🇧 English';
+    } else {
+      t('description', 'Welcome to Inside Roleplay — An RP Server on Roblox.');
+      t('uptimeLabel', 'Uptime');
+      t('playersLabel', 'Online Players');
+      t('securityLabel', 'Security');
+      t('rulesTitle', '📕〢Server Rules');
+      $('rulesDesc').innerHTML = 'Be kind, no mocking.<br>Play proper RP.<br>Always listen to Staffs.';
+      t('infoTitle', '🌴〢Server Info.');
+      t('infoDesc', 'Created: July 31, 2025');
+      t('loginTitle', 'Login');
+      t('registerTitle', 'Register');
+      t('toRegister', 'No account? Register');
+      if (logoutBtn) logoutBtn.textContent = 'Logout';
+      if (btnEl) btnEl.textContent = '🇬🇷 Greek';
+      if (btnEn) btnEn.textContent = '🇬🇧 English';
+    }
+    // Reflect login state on button label
+    loginBtn.textContent = isLoggedIn() ? (localStorage.getItem('InsideRP_Username') || 'Login') : 'Login';
+  };
+  btnEl.addEventListener('click', () => setLanguage('el'));
+  btnEn.addEventListener('click', () => setLanguage('en'));
+  setLanguage('el');
+
+  // Online players counter
+  const animatePlayers = (target = 20) => {
+    let current = 0;
+    onlineCountEl.textContent = '0';
+    const timer = setInterval(() => {
+      current++;
+      onlineCountEl.textContent = current + '+';
+      if (current >= target) clearInterval(timer);
+    }, 100);
+  };
+  animatePlayers();
+
+  // Overlay helpers
+  const openLogin = () => { loginOverlay.style.display = 'flex'; loginMsg.textContent = ''; };
+  const closeLoginFn = () => { loginOverlay.style.display = 'none'; loginMsg.textContent = ''; };
+  const openRegister = () => { registerOverlay.style.display = 'flex'; registerMsg.textContent = ''; };
+  const closeRegisterFn = () => { registerOverlay.style.display = 'none'; registerMsg.textContent = ''; };
+
+  // Wire buttons
+  loginBtn.addEventListener('click', () => {
+    if (isLoggedIn()) return;
+    openLogin();
+  });
+  logoutBtn.addEventListener('click', () => {
+    localStorage.setItem('InsideRP_LoggedIn', 'false');
+    loginBtn.textContent = 'Login';
+    logoutBtn.style.display = 'none';
+  });
+  closeLogin.addEventListener('click', closeLoginFn);
+  closeRegister.addEventListener('click', closeRegisterFn);
+
+  // Click outside to close overlays
+  [loginOverlay, registerOverlay].forEach(overlay => {
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.style.display = 'none';
+    });
+  });
+
+  // Escape key closes overlays
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { closeLoginFn(); closeRegisterFn(); }
+  });
+
+  // Switch to Register
+  toRegister.addEventListener('click', () => {
+    closeLoginFn();
+    openRegister();
+  });
+
+  // Register (password >= 5) and auto-return to Login
+  doRegister.addEventListener('click', () => {
+    const u = $('regUsername').value.trim();
+    const p = $('regPassword').value.trim();
+
+    if (!u || !p) {
+      registerMsg.textContent = 'Συμπλήρωσε όλα τα πεδία.';
+      registerMsg.className = 'msg err';
+      return;
+    }
+    if (p.length < 5) {
+      registerMsg.textContent = 'Ο κωδικός πρέπει να έχει τουλάχιστον 5 χαρακτήρες.';
+      registerMsg.className = 'msg err';
+      return;
+    }
+
+    localStorage.setItem('InsideRP_Username', u);
+    localStorage.setItem('InsideRP_Password', p);
+    registerMsg.textContent = 'Ο λογαριασμός δημιουργήθηκε!';
+    registerMsg.className = 'msg ok';
+    setTimeout(() => {
+      closeRegisterFn();
+      openLogin();
+      $('loginUsername').value = u;
+    }, 600);
+  });
+
+  // Login and persist
+  doLogin.addEventListener('click', () => {
+    const u = $('loginUsername').value.trim();
+    const p = $('loginPassword').value.trim();
+    const su = localStorage.getItem('InsideRP_Username');
+    const sp = localStorage.getItem('InsideRP_Password');
+
+    if (u && p && u === su && p === sp) {
+      loginMsg.textContent = 'Επιτυχής σύνδεση!';
+      loginMsg.className = 'msg ok';
+      localStorage.setItem('InsideRP_LoggedIn', 'true');
+      setTimeout(() => {
+        closeLoginFn();
+        loginBtn.textContent = u;
+        logoutBtn.style.display = 'inline-block';
+      }, 500);
+    } else {
+      loginMsg.textContent = 'Λάθος στοιχεία ή δεν υπάρχει λογαριασμός.';
+      loginMsg.className = 'msg err';
+    }
+  });
+
+  // Persist login on load
+  const savedUser = localStorage.getItem('InsideRP_Username');
+  if (savedUser && isLoggedIn()) {
+    loginBtn.textContent = savedUser;
+    logoutBtn.style.display = 'inline-block';
+  }
+});
+</script>
+
+</body>
+</html>
